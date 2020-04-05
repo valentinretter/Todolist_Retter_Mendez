@@ -14,11 +14,11 @@ myApp.services = {
     // Creates a new task and attaches it to the pending task list.
     create: function (data) {
       // Task item template.
-      var checkbox = '<ons-checkbox></ons-checkbox>';
+      let checkbox = '<ons-checkbox></ons-checkbox>';
       if(data.checked){
         checkbox = '<ons-checkbox checked></ons-checkbox>';
       }
-      var taskItem = ons.createElement(
+      let taskItem = ons.createElement(
         //'<ons-list-item tappable category="' + myApp.services.categories.parseId(data.category)+ '">' +
         '<ons-list-item tappable category="' + data.category + '">' +
         '<label class="left">' +
@@ -38,16 +38,24 @@ myApp.services = {
       // Store data within the element.
       taskItem.data = data;
 
-      var pendingList = document.querySelector('#pending-list');
-      pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+      if(taskItem.data.state=="pending"){
+        let pendingList = document.querySelector('#pending-list');
+        pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+      }else if(taskItem.data.state=="en_cours"){
+        let activeList = document.querySelector('#active-list');
+        activeList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+      }else if(taskItem.data.state=="finie"){
+        let completedList = document.querySelector('#completed-list');
+        completedList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+      }
 
       // Add 'completion' functionality when the checkbox changes.
       taskItem.data.onCheckboxChange = function(event) {
-        var tabData = JSON.parse(storage.getItem("data"));
-        tabData.map((x)=>{
+        var tabTaches = JSON.parse(storage.getItem("taches"));
+        tabTaches.map((x)=>{
           if(x.title==taskItem.data.title){x.checked=!x.checked}
         });
-        storage.setItem("data",JSON.stringify(tabData));
+        storage.setItem("taches",JSON.stringify(tabTaches));
       };
 
       taskItem.addEventListener('change', taskItem.data.onCheckboxChange);
@@ -71,27 +79,38 @@ myApp.services = {
   // Deletes a task item and its listeners.
 remove: function(taskItem) {
   taskItem.removeEventListener('change', taskItem.data.onCheckboxChange);
-  var tabData = JSON.parse(storage.getItem("data"));
-  var indice = 0;
-  var indiceVal = -1;
-  tabData.map((x)=>{
+  let tabTaches = JSON.parse(storage.getItem("taches"));
+  let indice = 0;
+  let indiceVal = -1;
+  tabTaches.map((x)=>{
     if(x.title==taskItem.data.title){indiceVal=indice;}
     indice++;
   });
-  tabData.splice(indiceVal);
-  storage.setItem("data",JSON.stringify(tabData));
+  tabTaches.splice(indiceVal);
+  storage.setItem("compteur",parseInt(storage.getItem("compteur"))-1);
+  storage.setItem("taches",JSON.stringify(tabTaches));
   taskItem.remove();
 },
 
 passageEnCours: function(taskItem){
   taskItem.remove();
-  var activeList = document.querySelector('#active-list');
+  let tabTaches = JSON.parse(storage.getItem("taches"));
+  tabTaches.map((x)=>{
+    if(x.title==taskItem.data.title){x.state="en_cours";}
+  });
+  storage.setItem("taches",JSON.stringify(tabTaches));
+  let activeList = document.querySelector('#active-list');
   activeList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
 },
 
 passageFinie: function(taskItem){
   taskItem.remove();
-  var completedList = document.querySelector('#completed-list');
+  let tabTaches = JSON.parse(storage.getItem("taches"));
+  tabTaches.map((x)=>{
+    if(x.title==taskItem.data.title){x.state="finie";}
+  });
+  storage.setItem("taches",JSON.stringify(tabTaches));
+  let completedList = document.querySelector('#completed-list');
   completedList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
 },
 

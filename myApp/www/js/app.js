@@ -16,10 +16,22 @@ document.addEventListener('init', function(event) {
       && document.querySelector('#pendingTasksPage')
       && !document.querySelector('#pendingTasksPage ons-list-item')
     ) {
-      //storage.setItem("data",JSON.stringify(myApp.services.fixtures)); //POUR RE-REMPLIR LE TABLEAU
-      JSON.parse(storage.getItem("data")).forEach(function (data) {
-        myApp.services.tasks.create(data);
-      });
+      if(storage.getItem("compteur")===null){ //initatilisation
+        let cpt = 0;
+        let tab = []
+        myApp.services.fixtures.forEach(e => {
+          cpt++;
+          tab.push(e);
+        });
+        console.log(tab);
+        storage.setItem("taches",JSON.stringify(tab));
+        storage.setItem("compteur",cpt);
+      }
+      let compteur = storage.getItem("compteur")
+      let taches = JSON.parse(storage.getItem("taches"));
+      for(let i = 0; i<compteur;i++){
+        myApp.services.tasks.create(taches[i]);
+      }
     }
   }
 });

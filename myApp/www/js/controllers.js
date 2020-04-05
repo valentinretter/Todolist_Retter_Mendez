@@ -30,21 +30,22 @@ myApp.controllers = {
     // Set button functionality to save a new task.
     Array.prototype.forEach.call(page.querySelectorAll('[component="button/save-task"]'), function(element) {
       element.onclick = function() {
-        var newTitle = page.querySelector('#title-input').value;
+        let newTitle = page.querySelector('#title-input').value;
 
         if (newTitle) {
           // If input title is not empty, create a new task.
-          var tab = {
+          let tache = {
             title: newTitle,
             category: page.querySelector('#category-input').value,
             description: page.querySelector('#description-input').value,
             checked: false,
             state : "pending"
           };
-          var tabData = JSON.parse(storage.getItem("data"));
-          tabData.push(tab);
-          storage.setItem("data",JSON.stringify(tabData));
-          myApp.services.tasks.create(tab);
+          let tabTaches = JSON.parse(storage.getItem("taches"));
+          tabTaches.push(tache);
+          storage.setItem("taches",JSON.stringify(tabTaches));
+          storage.setItem("compteur",parseInt(storage.getItem("compteur"))+1);
+          myApp.services.tasks.create(tache);
 
           // Set selected category to 'All', refresh and pop page.
           document.querySelector('#default-category-list ons-list-item ons-radio').checked = true;
@@ -52,7 +53,7 @@ myApp.controllers = {
 
         } else {
           // Show alert if the input title is empty.
-          ons.notification.alert('You must provide a task title.');
+          ons.notification.alert('Vous devez nommer la tâche!');
         }
       };
     });
