@@ -23,7 +23,6 @@ document.addEventListener('init', function(event) {
           cpt++;
           tab.push(e);
         });
-        console.log(tab);
         storage.setItem("taches",JSON.stringify(tab));
         storage.setItem("compteur",cpt);
       }

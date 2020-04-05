@@ -18,6 +18,15 @@ myApp.services = {
       if(data.checked){
         checkbox = '<ons-checkbox checked></ons-checkbox>';
       }
+      let boutons = "";
+      if(data.state=="pending"){
+        boutons='<ons-button class="passEnCours">En cours</ons-button><ons-button class="passFinie">Finie</ons-button>';
+      }else if(data.state=="en_cours"){
+        boutons='<ons-button class="passEnAtt">En attente</ons-button><ons-button class="passFinie">Finie</ons-button>';
+      }else if(data.state=="finie"){
+        boutons='<ons-button class="passEnAtt">En attente</ons-button><ons-button class="passEnCours">En cours</ons-button>';
+      }
+
       let taskItem = ons.createElement(
         //'<ons-list-item tappable category="' + myApp.services.categories.parseId(data.category)+ '">' +
         '<ons-list-item tappable category="' + data.category + '">' +
@@ -28,8 +37,7 @@ myApp.services = {
         data.title +
         '</div>' +
         '<div class="right">' +
-        '<ons-button class="passEnCours">En cours</ons-button>' +
-        '<ons-button class="passFinie">Finie</ons-button>' +
+        boutons +
         '<ons-icon class="suppr" style="color: grey; padding-left: 4px" icon="ion-ios-trash-outline, material:md-delete"></ons-icon>' +
         '</div>' +
         '</ons-list-item>'
@@ -37,16 +45,19 @@ myApp.services = {
 
       // Store data within the element.
       taskItem.data = data;
-
-      if(taskItem.data.state=="pending"){
-        let pendingList = document.querySelector('#pending-list');
-        pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
-      }else if(taskItem.data.state=="en_cours"){
-        let activeList = document.querySelector('#active-list');
-        activeList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
-      }else if(taskItem.data.state=="finie"){
-        let completedList = document.querySelector('#completed-list');
-        completedList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+      if (document.querySelector('#activeTasksPage')
+        && document.querySelector('#completedTasksPage') || true
+      ) {
+        if(taskItem.data.state=="pending"){
+          let pendingList = document.querySelector('#pending-list');
+          pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+        }else if(taskItem.data.state=="en_cours"){
+          let activeList = document.querySelector('#active-list');
+          activeList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+        }else if(taskItem.data.state=="finie"){
+          let completedList = document.querySelector('#completed-list');
+          completedList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+        }
       }
 
       // Add 'completion' functionality when the checkbox changes.
@@ -65,12 +76,21 @@ myApp.services = {
         myApp.services.remove(taskItem);
       };
 
-      taskItem.querySelector('.passEnCours').onclick = function() {
-        myApp.services.passageEnCours(taskItem);
-      };
-      taskItem.querySelector('.passFinie').onclick = function() {
-        myApp.services.passageFinie(taskItem);
-      };
+      if(data.state!="pending"){
+        taskItem.querySelector('.passEnAtt').onclick = function() {
+          myApp.services.passageEnAttente(taskItem);
+        };
+      }
+      if(data.state!="en_cours"){
+        taskItem.querySelector('.passEnCours').onclick = function() {
+          myApp.services.passageEnCours(taskItem);
+        };
+      }
+      if(data.state!="finie"){
+        taskItem.querySelector('.passFinie').onclick = function() {
+          myApp.services.passageFinie(taskItem);
+        };
+      }
     },
 
 
@@ -92,26 +112,31 @@ remove: function(taskItem) {
   taskItem.remove();
 },
 
+passageEnAttente: function(taskItem){
+  taskItem.remove();
+  let tabTaches = JSON.parse(storage.getItem("taches"));
+  tabTaches.map((x)=>{
+    if(x.title==taskItem.data.title){x.state="pending";myApp.services.tasks.create(x);}
+  });
+  storage.setItem("taches",JSON.stringify(tabTaches));
+},
+
 passageEnCours: function(taskItem){
   taskItem.remove();
   let tabTaches = JSON.parse(storage.getItem("taches"));
   tabTaches.map((x)=>{
-    if(x.title==taskItem.data.title){x.state="en_cours";}
+    if(x.title==taskItem.data.title){x.state="en_cours";myApp.services.tasks.create(x);}
   });
   storage.setItem("taches",JSON.stringify(tabTaches));
-  let activeList = document.querySelector('#active-list');
-  activeList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
 },
 
 passageFinie: function(taskItem){
   taskItem.remove();
   let tabTaches = JSON.parse(storage.getItem("taches"));
   tabTaches.map((x)=>{
-    if(x.title==taskItem.data.title){x.state="finie";}
+    if(x.title==taskItem.data.title){x.state="finie";myApp.services.tasks.create(x);}
   });
   storage.setItem("taches",JSON.stringify(tabTaches));
-  let completedList = document.querySelector('#completed-list');
-  completedList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
 },
 
   ////////////////////////

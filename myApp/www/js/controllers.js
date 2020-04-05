@@ -21,6 +21,28 @@ myApp.controllers = {
 
       element.show && element.show(); // Fix ons-fab in Safari.
     });
+
+    Array.prototype.forEach.call(page.querySelectorAll('[component="button/delete-selected"]'), function(element) {
+      element.onclick = function() {
+        ons.notification.confirm(
+          {
+            title : 'supprimer toutes les tâches?',
+            message: 'Toutes les tâches (quelle que soit la catégorie) seront perdues.',
+            buttonLabels : ['Oui','Non']
+          }
+        ).then(function(buttonIndex){
+          if(buttonIndex==0){
+            storage.setItem("compteur",0)
+            storage.setItem("taches",JSON.stringify([]));
+            document.querySelector('#pending-list').innerHTML = "";
+            document.querySelector('#active-list').innerHTML = "";
+            document.querySelector('#completed-list').innerHTML = "";
+          }
+        }
+      )};
+
+      element.show && element.show(); // Fix ons-fab in Safari.
+    });
   },
 
   ////////////////////////////
