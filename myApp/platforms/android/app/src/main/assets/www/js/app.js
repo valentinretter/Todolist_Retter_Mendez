@@ -16,7 +16,7 @@ document.addEventListener('init', function(event) {
       && document.querySelector('#pendingTasksPage')
       && !document.querySelector('#pendingTasksPage ons-list-item')
     ) {
-      //storage.setItem("data",JSON.stringify(myApp.services.fixtures)); //POUR RE-REMPLIR LE TABLEAU
+      storage.setItem("data",JSON.stringify(myApp.services.fixtures)); //POUR RE-REMPLIR LE TABLEAU
       JSON.parse(storage.getItem("data")).forEach(function (data) {
         myApp.services.tasks.create(data);
       });

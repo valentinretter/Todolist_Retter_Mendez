@@ -27,21 +27,57 @@ myApp.controllers = {
   // New Task Page Controller //
   ////////////////////////////
   newTaskPage: function(page) {
+    var num = 0;
+    var tabData = JSON.parse(storage.getItem("data"));
+    var tab2 = [];
+    tabData.forEach((x) => {
+        var cat = x.category;
+        if(!tab2.includes(cat)){tab2.push(cat);}
+    });
+    tab2.forEach(function (data) {
+              var s = 'item'+num;
+              if(data!=null && data!=''){
+                    page.querySelector('#list-item').appendChild(ons._util.createElement('<ons-list-item modifier="longdivider" id="'+s+'"><div class="right"><ons-checkbox>'));
+                    page.querySelector('#'+s).appendChild(document.createTextNode(''+data));
+                    num++;
+              }
+    });
     // Set button functionality to save a new task.
     Array.prototype.forEach.call(page.querySelectorAll('[component="button/save-task"]'), function(element) {
       element.onclick = function() {
         var newTitle = page.querySelector('#title-input').value;
-
+        var tabData = JSON.parse(storage.getItem("data"));
+        var newCat = page.querySelector('#category-input').value;
+        var check = false;
+        var numero = 0;
+        var n =0;
+        var liste = page.querySelectorAll('ons-checkbox').forEach((x)=>{
+            if(x.checked){check=true; numero=n;}
+            console.log(n);
+            n++;
+        });
         if (newTitle) {
           // If input title is not empty, create a new task.
-          var tab = {
-            title: newTitle,
-            category: page.querySelector('#category-input').value,
-            description: page.querySelector('#description-input').value,
-            checked: false,
-            state : "pending"
-          };
-          var tabData = JSON.parse(storage.getItem("data"));
+          if(newCat){
+            var tab = {
+                 title: newTitle,
+                 category: newCat,
+                 description: page.querySelector('#description-input').value,
+                 checked: false,
+                 state : "pending"
+            };
+          }else if(check){
+             var tab = {
+                  title: newTitle,
+                  category: tab2[numero],
+                  description: page.querySelector('#description-input').value,
+                  checked: false,
+                  state : "pending"
+                  };
+          }else{
+            ons.notification.alert('Vous devez mettre une catégorie à la tâche');
+          }
+
           tabData.push(tab);
           storage.setItem("data",JSON.stringify(tabData));
           myApp.services.tasks.create(tab);
@@ -50,9 +86,10 @@ myApp.controllers = {
           document.querySelector('#default-category-list ons-list-item ons-radio').checked = true;
           document.querySelector('#myNavigator').popPage();
 
+
         } else {
           // Show alert if the input title is empty.
-          ons.notification.alert('You must provide a task title.');
+          ons.notification.alert('Vous devez mettre un titre à la tâche');
         }
       };
     });
