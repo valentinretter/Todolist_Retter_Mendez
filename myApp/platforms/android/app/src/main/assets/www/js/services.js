@@ -4,7 +4,7 @@
 var storage = window.localStorage;
 myApp.services = {
 
-  //DEBUG DEBUG DEBUG AJOTUER UN ATTRIBUT POUR SAVOIR L'ETAT D'UNE TACHE
+  //DEBUG DEBUG DEBUG AJOUTER UN ATTRIBUT POUR SAVOIR L'ETAT D'UNE TACHE
 
   /////////////////
   // Task Service //

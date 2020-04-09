@@ -24,6 +24,38 @@ myApp.controllers = {
   },
 
   ////////////////////////////
+  // Menu Page Controller //
+  ////////////////////////////
+
+  menuPage: function(page) {
+    page.querySelector('[input-id="r-no"]').onclick = function(){
+        var pendingList = document.querySelector('#pending-list');
+        var childs = pendingList.childNodes;
+        childs.forEach((x)=>{
+            pendingList.removeChild(x);
+        });
+
+    };
+
+    var tabData = JSON.parse(storage.getItem("data"));
+    var tab2 = [];
+    tabData.forEach((x) => {
+        var cat = x.category;
+        if(!tab2.includes(cat)){tab2.push(cat);}
+    });
+    tab2.forEach(function (data) {
+        if(data!=null && data!=''){
+            page.querySelector('#custom-category-list').appendChild(ons._util.createElement('<ons-list-item tappable>'
+                                                                                           +'   <div class="left">'
+                                                                                           +'    <ons-radio name="categoryGroup" input-id="r-all"></ons-radio>'
+                                                                                            +'  </div>'
+                                                                                            +'  <label class="center" for="r-all">'
+                                                                                       + data));
+    }});
+
+  },
+
+  ////////////////////////////
   // New Task Page Controller //
   ////////////////////////////
   newTaskPage: function(page) {
