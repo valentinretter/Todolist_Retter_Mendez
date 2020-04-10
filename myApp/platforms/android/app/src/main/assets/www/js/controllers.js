@@ -43,6 +43,40 @@ myApp.controllers = {
         }
     };
 
+    page.querySelector('[input-id="r-all"]').onclick = function(){
+        var tabData = JSON.parse(storage.getItem("data"));
+        tabData.forEach((data)=>{
+            var checkbox = '<ons-checkbox></ons-checkbox>';
+                  if(data.checked){
+                    checkbox = '<ons-checkbox checked></ons-checkbox>';
+                  }
+            var taskItem = ons.createElement(
+                            //'<ons-list-item tappable category="' + myApp.services.categories.parseId(data.category)+ '">' +
+                            '<ons-list-item tappable category="' + data.category + '">' +
+                            '<label class="left">' +
+                            checkbox +
+                            '</label>' +
+                            '<div class="center">' +
+                            data.title +
+                            '</div>' +
+                            '<div class="right">' +
+                            '<ons-button class="passEnCours">En cours</ons-button>' +
+                            '<ons-button class="passFinie">Finie</ons-button>' +
+                            '<ons-icon class="suppr" style="color: grey; padding-left: 4px" icon="ion-ios-trash-outline, material:md-delete"></ons-icon>' +
+                            '</div>' +
+                            '</ons-list-item>'
+                          );
+
+                          // Store data within the element.
+                          taskItem.data = data;
+
+                          var pendingList = document.querySelector('#pending-list');
+                          pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+        });
+
+
+    };
+
     var tabData = JSON.parse(storage.getItem("data"));
     var tab2 = [];
     tabData.forEach((x) => {
