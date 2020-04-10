@@ -30,11 +30,17 @@ myApp.controllers = {
   menuPage: function(page) {
     page.querySelector('[input-id="r-no"]').onclick = function(){
         var pendingList = document.querySelector('#pending-list');
-        var childs = pendingList.childNodes;
-        childs.forEach((x)=>{
-            pendingList.removeChild(x);
-        });
-
+        var a = [];
+        var regex = /[[:space:]]*/;
+        var child = pendingList.children;
+        for (var i = 0; i < child.length; i++) {
+          if(child[i].getAttribute('category').match(regex)!=null){
+            a.push(child[i]);
+          }
+        }
+        for (var i = 0; i < a.length; i++) {
+            pendingList.removeChild(a[i]);
+        }
     };
 
     var tabData = JSON.parse(storage.getItem("data"));
