@@ -28,21 +28,56 @@ myApp.controllers = {
   ////////////////////////////
 
   menuPage: function(page) {
+
+    //Sans catégorie
     page.querySelector('[input-id="r-no"]').onclick = function(){
         var pendingList = document.querySelector('#pending-list');
-        var a = [];
+                        var a = [];
+                        var child = pendingList.children;
+                        for (var i = 0; i < child.length; i++) {
+                            a.push(child[i]);
+                        }
+                        for (var i = 0; i < a.length; i++) {
+                            pendingList.removeChild(a[i]);
+                        }
         var regex = /[[:space:]]*/;
-        var child = pendingList.children;
-        for (var i = 0; i < child.length; i++) {
-          if(child[i].getAttribute('category').match(regex)!=null){
-            a.push(child[i]);
-          }
-        }
-        for (var i = 0; i < a.length; i++) {
-            pendingList.removeChild(a[i]);
-        }
+        var tabData = JSON.parse(storage.getItem("data"));
+                tabData.forEach((data)=>{
+                    if(data.category.match(regex)==null){
+
+                    var checkbox = '<ons-checkbox></ons-checkbox>';
+                          if(data.checked){
+                            checkbox = '<ons-checkbox checked></ons-checkbox>';
+                          }
+                    var taskItem = ons.createElement(
+                                    //'<ons-list-item tappable category="' + myApp.services.categories.parseId(data.category)+ '">' +
+                                    '<ons-list-item tappable category="' + data.category + '">' +
+                                    '<label class="left">' +
+                                    checkbox +
+                                    '</label>' +
+                                    '<div class="center">' +
+                                    data.title +
+                                    '</div>' +
+                                    '<div class="right">' +
+                                    '<ons-button class="passEnCours">En cours</ons-button>' +
+                                    '<ons-button class="passFinie">Finie</ons-button>' +
+                                    '<ons-icon class="suppr" style="color: grey; padding-left: 4px" icon="ion-ios-trash-outline, material:md-delete"></ons-icon>' +
+                                    '</div>' +
+                                    '</ons-list-item>'
+                                  );
+
+                                  // Store data within the element.
+                                  taskItem.data = data;
+
+                                  var pendingList = document.querySelector('#pending-list');
+                                  pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+                }
+                });
+
+
     };
 
+    //Toutes les catégories
     page.querySelector('[input-id="r-all"]').onclick = function(){
         var pendingList = document.querySelector('#pending-list');
                 var a = [];
@@ -86,20 +121,69 @@ myApp.controllers = {
 
     };
 
+
+
+    //Catégorie spécifique
     var tabData = JSON.parse(storage.getItem("data"));
     var tab2 = [];
     tabData.forEach((x) => {
         var cat = x.category;
         if(!tab2.includes(cat)){tab2.push(cat);}
     });
+    var id = 0;
     tab2.forEach(function (data) {
+        var i = 'el'+id;
         if(data!=null && data!=''){
-            page.querySelector('#custom-category-list').appendChild(ons._util.createElement('<ons-list-item tappable>'
-                                                                                           +'   <div class="left">'
-                                                                                           +'    <ons-radio name="categoryGroup" input-id="r-all"></ons-radio>'
-                                                                                            +'  </div>'
-                                                                                            +'  <label class="center" for="r-all">'
-                                                                                       + data));
+            var element = ons._util.createElement('<ons-list-item tappable>'
+                                                  +'   <div class="left">'
+                                                  +'    <ons-radio name="categoryGroup" input-id="r-all" id="'
+                                                  + i
+                                                  +'"></ons-radio>'
+                                                  +'  </div>'
+                                                  +'  <label class="center" for="r-all">'
+                                                  + data);
+            page.querySelector('#custom-category-list').appendChild(element);
+            page.querySelector('#'+i).onclick = function(){
+                var pendingList = document.querySelector('#pending-list');
+                                var a = [];
+                                var child = pendingList.children;
+                                for (var i = 0; i < child.length; i++) {
+                                    a.push(child[i]);
+                                }
+                                for (var i = 0; i < a.length; i++) {
+                                    pendingList.removeChild(a[i]);
+                                }
+                tabData.forEach((x)=>{
+                    if(x.category==data){
+                            var checkbox = '<ons-checkbox></ons-checkbox>';
+                                  if(x.checked){
+                                    checkbox = '<ons-checkbox checked></ons-checkbox>';
+                                  }
+                            var taskItem = ons.createElement(
+                                            //'<ons-list-item tappable category="' + myApp.services.categories.parseId(data.category)+ '">' +
+                                            '<ons-list-item tappable category="' + x.category + '">' +
+                                            '<label class="left">' +
+                                            checkbox +
+                                            '</label>' +
+                                            '<div class="center">' +
+                                            x.title +
+                                            '</div>' +
+                                            '<div class="right">' +
+                                            '<ons-button class="passEnCours">En cours</ons-button>' +
+                                            '<ons-button class="passFinie">Finie</ons-button>' +
+                                            '<ons-icon class="suppr" style="color: grey; padding-left: 4px" icon="ion-ios-trash-outline, material:md-delete"></ons-icon>' +
+                                            '</div>' +
+                                            '</ons-list-item>'
+                                          );
+
+                                          // Store data within the element.
+                                          taskItem.x = x;
+
+                                          var pendingList = document.querySelector('#pending-list');
+                                          pendingList.insertBefore(taskItem, taskItem.x.urgent ? pendingList.firstChild : null);
+                    }   });
+            }
+        id++;
     }});
 
   },
@@ -147,6 +231,56 @@ myApp.controllers = {
                  checked: false,
                  state : "pending"
             };
+            var element = ons._util.createElement('<ons-list-item tappable>'
+                                                              +'   <div class="left">'
+                                                              +'    <ons-radio name="categoryGroup" input-id="r-all"></ons-radio>'
+                                                              +'  </div>'
+                                                              +'  <label class="center" for="r-all">'
+                                                              + newCat);
+            document.querySelector('#custom-category-list').appendChild(element);
+            element.onclick = function(){
+                    var pendingList = document.querySelector('#pending-list');
+                            var a = [];
+                            var child = pendingList.children;
+                            for (var i = 0; i < child.length; i++) {
+                                a.push(child[i]);
+                            }
+                            for (var i = 0; i < a.length; i++) {
+                                pendingList.removeChild(a[i]);
+                            }
+                    var tabData = JSON.parse(storage.getItem("data"));
+                    tabData.forEach((data)=>{
+                        if(data.category==newCat){
+                        var checkbox = '<ons-checkbox></ons-checkbox>';
+                              if(data.checked){
+                                checkbox = '<ons-checkbox checked></ons-checkbox>';
+                              }
+                        var taskItem = ons.createElement(
+                                        //'<ons-list-item tappable category="' + myApp.services.categories.parseId(data.category)+ '">' +
+                                        '<ons-list-item tappable category="' + data.category + '">' +
+                                        '<label class="left">' +
+                                        checkbox +
+                                        '</label>' +
+                                        '<div class="center">' +
+                                        data.title +
+                                        '</div>' +
+                                        '<div class="right">' +
+                                        '<ons-button class="passEnCours">En cours</ons-button>' +
+                                        '<ons-button class="passFinie">Finie</ons-button>' +
+                                        '<ons-icon class="suppr" style="color: grey; padding-left: 4px" icon="ion-ios-trash-outline, material:md-delete"></ons-icon>' +
+                                        '</div>' +
+                                        '</ons-list-item>'
+                                      );
+
+                                      // Store data within the element.
+                                      taskItem.data = data;
+
+                                      var pendingList = document.querySelector('#pending-list');
+                                      pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+                    }});
+
+
+                };
           }else if(check){
              var tab = {
                   title: newTitle,
