@@ -71,6 +71,31 @@ myApp.controllers = {
 
                                   var pendingList = document.querySelector('#pending-list');
                                   pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+
+                // Add 'completion' functionality when the checkbox changes.
+                      taskItem.data.onCheckboxChange = function(event) {
+                        var tabData = JSON.parse(storage.getItem("data"));
+                        tabData.map((x)=>{
+                          if(x.title==taskItem.data.title){x.checked=!x.checked}
+                        });
+                        storage.setItem("data",JSON.stringify(tabData));
+                      };
+
+                      taskItem.addEventListener('change', taskItem.data.onCheckboxChange);
+
+                      // Add button functionality to remove a task.
+                      taskItem.querySelector('.suppr').onclick = function() {
+                        myApp.services.remove(taskItem);
+                      };
+
+                      taskItem.querySelector('.passEnCours').onclick = function() {
+                        myApp.services.passageEnCours(taskItem);
+                      };
+                      taskItem.querySelector('.passFinie').onclick = function() {
+                        myApp.services.passageFinie(taskItem);
+                      };
+
+
                 }
                 });
 
@@ -116,6 +141,31 @@ myApp.controllers = {
 
                           var pendingList = document.querySelector('#pending-list');
                           pendingList.insertBefore(taskItem, taskItem.data.urgent ? pendingList.firstChild : null);
+
+            // Add 'completion' functionality when the checkbox changes.
+                                  taskItem.data.onCheckboxChange = function(event) {
+                                    var tabData = JSON.parse(storage.getItem("data"));
+                                    tabData.map((x)=>{
+                                      if(x.title==taskItem.data.title){x.checked=!x.checked}
+                                    });
+                                    storage.setItem("data",JSON.stringify(tabData));
+                                  };
+
+                                  taskItem.addEventListener('change', taskItem.data.onCheckboxChange);
+
+                                  // Add button functionality to remove a task.
+                                  taskItem.querySelector('.suppr').onclick = function() {
+                                    myApp.services.remove(taskItem);
+                                  };
+
+                                  taskItem.querySelector('.passEnCours').onclick = function() {
+                                    myApp.services.passageEnCours(taskItem);
+                                  };
+                                  taskItem.querySelector('.passFinie').onclick = function() {
+                                    myApp.services.passageFinie(taskItem);
+                                  };
+
+
         });
 
 
@@ -181,6 +231,7 @@ myApp.controllers = {
 
                                           var pendingList = document.querySelector('#pending-list');
                                           pendingList.insertBefore(taskItem, taskItem.x.urgent ? pendingList.firstChild : null);
+
                     }   });
             }
         id++;
