@@ -44,6 +44,15 @@ myApp.controllers = {
     };
 
     page.querySelector('[input-id="r-all"]').onclick = function(){
+        var pendingList = document.querySelector('#pending-list');
+                var a = [];
+                var child = pendingList.children;
+                for (var i = 0; i < child.length; i++) {
+                    a.push(child[i]);
+                }
+                for (var i = 0; i < a.length; i++) {
+                    pendingList.removeChild(a[i]);
+                }
         var tabData = JSON.parse(storage.getItem("data"));
         tabData.forEach((data)=>{
             var checkbox = '<ons-checkbox></ons-checkbox>';
